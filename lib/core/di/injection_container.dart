@@ -21,6 +21,15 @@ import 'package:olie/features/notes/domain/usecases/delete_note.dart';
 import 'package:olie/features/notes/domain/usecases/get_notes.dart';
 import 'package:olie/features/notes/domain/usecases/update_note.dart';
 import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
+import 'package:olie/features/planned_items/data/datasources/planned_item_remote_data_source.dart';
+import 'package:olie/features/planned_items/data/repositories/planned_item_repository_impl.dart';
+import 'package:olie/features/planned_items/domain/repositories/planned_item_repository.dart';
+import 'package:olie/features/planned_items/domain/usecases/add_planned_item.dart';
+import 'package:olie/features/planned_items/domain/usecases/complete_planned_item.dart';
+import 'package:olie/features/planned_items/domain/usecases/delete_planned_item.dart';
+import 'package:olie/features/planned_items/domain/usecases/get_planned_items.dart';
+import 'package:olie/features/planned_items/domain/usecases/update_planned_item.dart';
+import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
 import 'package:olie/features/todo/data/datasources/todo_local_data_source.dart';
 import 'package:olie/features/todo/data/repositories/todo_repository_impl.dart';
 import 'package:olie/features/todo/domain/repositories/todo_repository.dart';
@@ -104,6 +113,31 @@ Future<void> initDependencies() async {
       addNote: sl(),
       updateNote: sl(),
       deleteNote: sl(),
+    ),
+  );
+
+  // Feature: Planned Items
+  sl.registerLazySingleton<PlannedItemRemoteDataSource>(
+    () => PlannedItemRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<PlannedItemRepository>(
+    () => PlannedItemRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => GetPlannedItems(sl()));
+  sl.registerLazySingleton(() => AddPlannedItem(sl()));
+  sl.registerLazySingleton(() => UpdatePlannedItem(sl()));
+  sl.registerLazySingleton(() => DeletePlannedItem(sl()));
+  sl.registerLazySingleton(() => CompletePlannedItem(sl()));
+
+  sl.registerFactory(
+    () => PlannedItemBloc(
+      getPlannedItems: sl(),
+      addPlannedItem: sl(),
+      updatePlannedItem: sl(),
+      deletePlannedItem: sl(),
+      completePlannedItem: sl(),
     ),
   );
 }

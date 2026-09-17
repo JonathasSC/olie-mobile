@@ -9,6 +9,8 @@ import 'package:olie/features/auth/presentation/screens/login_screen.dart';
 import 'package:olie/features/auth/presentation/screens/register_screen.dart';
 import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
 import 'package:olie/features/notes/presentation/screens/notes_screen.dart';
+import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
+import 'package:olie/features/planned_items/presentation/screens/planned_items_screen.dart';
 import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:olie/features/todo/presentation/screens/todo_screen.dart';
 
@@ -41,6 +43,11 @@ class MyApp extends StatelessWidget {
           '/notes': (_) => BlocProvider(
                 create: (_) => di.sl<NoteBloc>()..add(const NotesRequested()),
                 child: const NotesScreen(),
+              ),
+          '/planned-items': (_) => BlocProvider(
+                create: (_) => di.sl<PlannedItemBloc>()
+                  ..add(const PlannedItemsRequested()),
+                child: const PlannedItemsScreen(),
               ),
         },
       ),
