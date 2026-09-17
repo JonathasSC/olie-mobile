@@ -15,6 +15,11 @@ class TodoScreen extends StatelessWidget {
         title: const Text('Tarefas'),
         actions: [
           IconButton(
+            tooltip: 'Metas de economia',
+            icon: const Icon(Icons.savings_outlined),
+            onPressed: () => Navigator.of(context).pushNamed('/savings-goals'),
+          ),
+          IconButton(
             tooltip: 'Itens planejados',
             icon: const Icon(Icons.shopping_cart_outlined),
             onPressed: () => Navigator.of(context).pushNamed('/planned-items'),

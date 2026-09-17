@@ -11,6 +11,8 @@ import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
 import 'package:olie/features/notes/presentation/screens/notes_screen.dart';
 import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
 import 'package:olie/features/planned_items/presentation/screens/planned_items_screen.dart';
+import 'package:olie/features/savings_goals/presentation/bloc/savings_goal_bloc.dart';
+import 'package:olie/features/savings_goals/presentation/screens/savings_goals_screen.dart';
 import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:olie/features/todo/presentation/screens/todo_screen.dart';
 
@@ -48,6 +50,11 @@ class MyApp extends StatelessWidget {
                 create: (_) => di.sl<PlannedItemBloc>()
                   ..add(const PlannedItemsRequested()),
                 child: const PlannedItemsScreen(),
+              ),
+          '/savings-goals': (_) => BlocProvider(
+                create: (_) => di.sl<SavingsGoalBloc>()
+                  ..add(const SavingsGoalsRequested()),
+                child: const SavingsGoalsScreen(),
               ),
         },
       ),

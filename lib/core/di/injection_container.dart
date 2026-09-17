@@ -30,6 +30,14 @@ import 'package:olie/features/planned_items/domain/usecases/delete_planned_item.
 import 'package:olie/features/planned_items/domain/usecases/get_planned_items.dart';
 import 'package:olie/features/planned_items/domain/usecases/update_planned_item.dart';
 import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
+import 'package:olie/features/savings_goals/data/datasources/savings_goal_remote_data_source.dart';
+import 'package:olie/features/savings_goals/data/repositories/savings_goal_repository_impl.dart';
+import 'package:olie/features/savings_goals/domain/repositories/savings_goal_repository.dart';
+import 'package:olie/features/savings_goals/domain/usecases/add_savings_goal.dart';
+import 'package:olie/features/savings_goals/domain/usecases/delete_savings_goal.dart';
+import 'package:olie/features/savings_goals/domain/usecases/get_savings_goals.dart';
+import 'package:olie/features/savings_goals/domain/usecases/update_savings_goal.dart';
+import 'package:olie/features/savings_goals/presentation/bloc/savings_goal_bloc.dart';
 import 'package:olie/features/todo/data/datasources/todo_local_data_source.dart';
 import 'package:olie/features/todo/data/repositories/todo_repository_impl.dart';
 import 'package:olie/features/todo/domain/repositories/todo_repository.dart';
@@ -138,6 +146,29 @@ Future<void> initDependencies() async {
       updatePlannedItem: sl(),
       deletePlannedItem: sl(),
       completePlannedItem: sl(),
+    ),
+  );
+
+  // Feature: Savings Goals
+  sl.registerLazySingleton<SavingsGoalRemoteDataSource>(
+    () => SavingsGoalRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<SavingsGoalRepository>(
+    () => SavingsGoalRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => GetSavingsGoals(sl()));
+  sl.registerLazySingleton(() => AddSavingsGoal(sl()));
+  sl.registerLazySingleton(() => UpdateSavingsGoal(sl()));
+  sl.registerLazySingleton(() => DeleteSavingsGoal(sl()));
+
+  sl.registerFactory(
+    () => SavingsGoalBloc(
+      getSavingsGoals: sl(),
+      addSavingsGoal: sl(),
+      updateSavingsGoal: sl(),
+      deleteSavingsGoal: sl(),
     ),
   );
 }
