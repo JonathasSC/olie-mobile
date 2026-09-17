@@ -11,7 +11,16 @@ class TodoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Tarefas')),
+      appBar: AppBar(
+        title: const Text('Tarefas'),
+        actions: [
+          IconButton(
+            tooltip: 'Notas',
+            icon: const Icon(Icons.note_outlined),
+            onPressed: () => Navigator.of(context).pushNamed('/notes'),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           TodoInputField(

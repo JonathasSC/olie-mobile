@@ -7,6 +7,8 @@ import 'package:olie/core/theme/app_theme.dart';
 import 'package:olie/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:olie/features/auth/presentation/screens/login_screen.dart';
 import 'package:olie/features/auth/presentation/screens/register_screen.dart';
+import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
+import 'package:olie/features/notes/presentation/screens/notes_screen.dart';
 import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:olie/features/todo/presentation/screens/todo_screen.dart';
 
@@ -35,6 +37,10 @@ class MyApp extends StatelessWidget {
           '/home': (_) => BlocProvider(
                 create: (_) => di.sl<TodoBloc>()..add(const TodosRequested()),
                 child: const TodoScreen(),
+              ),
+          '/notes': (_) => BlocProvider(
+                create: (_) => di.sl<NoteBloc>()..add(const NotesRequested()),
+                child: const NotesScreen(),
               ),
         },
       ),
