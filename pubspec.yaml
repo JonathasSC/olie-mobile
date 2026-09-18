@@ -56,6 +56,9 @@ dependencies:
   # Secure local storage (auth token)
   flutter_secure_storage: ^9.2.4
 
+  # STOMP over WebSocket (real-time notifications)
+  stomp_dart_client: ^3.0.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:olie/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:olie/features/auth/presentation/widgets/auth_submit_button.dart';
 import 'package:olie/features/auth/presentation/widgets/auth_text_field.dart';
+import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -54,6 +55,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             }
 
             if (state.status == AuthStatus.success) {
+              context.read<NotificationBloc>()
+                ..add(const NotificationsRequested())
+                ..add(const RealtimeConnectionRequested());
               Navigator.of(context).pushNamedAndRemoveUntil(
                 '/home',
                 (route) => false,

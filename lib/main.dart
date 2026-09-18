@@ -9,12 +9,16 @@ import 'package:olie/features/auth/presentation/screens/login_screen.dart';
 import 'package:olie/features/auth/presentation/screens/register_screen.dart';
 import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
 import 'package:olie/features/notes/presentation/screens/notes_screen.dart';
+import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
+import 'package:olie/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
 import 'package:olie/features/planned_items/presentation/screens/planned_items_screen.dart';
 import 'package:olie/features/savings_goals/presentation/bloc/savings_goal_bloc.dart';
 import 'package:olie/features/savings_goals/presentation/screens/savings_goals_screen.dart';
 import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:olie/features/todo/presentation/screens/todo_screen.dart';
+
+final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,14 +31,33 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => di.sl<AuthBloc>(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => di.sl<AuthBloc>()),
+        BlocProvider.value(value: di.sl<NotificationBloc>()),
+      ],
       child: MaterialApp(
         title: AppConstants.appName,
         debugShowCheckedModeBanner: false,
+        scaffoldMessengerKey: scaffoldMessengerKey,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         initialRoute: '/login',
+        builder: (context, child) {
+          return BlocListener<NotificationBloc, NotificationState>(
+            listenWhen: (previous, current) =>
+                current.lastReceived != null &&
+                previous.lastReceived != current.lastReceived,
+            listener: (context, state) {
+              scaffoldMessengerKey.currentState
+                ?..hideCurrentSnackBar()
+                ..showSnackBar(
+                  SnackBar(content: Text(state.lastReceived!.message)),
+                );
+            },
+            child: child,
+          );
+        },
         routes: {
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
@@ -56,6 +79,7 @@ class MyApp extends StatelessWidget {
                   ..add(const SavingsGoalsRequested()),
                 child: const SavingsGoalsScreen(),
               ),
+          '/notifications': (_) => const NotificationsScreen(),
         },
       ),
     );

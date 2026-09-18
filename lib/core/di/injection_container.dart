@@ -21,6 +21,14 @@ import 'package:olie/features/notes/domain/usecases/delete_note.dart';
 import 'package:olie/features/notes/domain/usecases/get_notes.dart';
 import 'package:olie/features/notes/domain/usecases/update_note.dart';
 import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
+import 'package:olie/features/notifications/data/datasources/notification_realtime_data_source.dart';
+import 'package:olie/features/notifications/data/datasources/notification_remote_data_source.dart';
+import 'package:olie/features/notifications/data/repositories/notification_repository_impl.dart';
+import 'package:olie/features/notifications/domain/repositories/notification_repository.dart';
+import 'package:olie/features/notifications/domain/usecases/disconnect_realtime_notifications.dart';
+import 'package:olie/features/notifications/domain/usecases/get_notifications.dart';
+import 'package:olie/features/notifications/domain/usecases/watch_realtime_notifications.dart';
+import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:olie/features/planned_items/data/datasources/planned_item_remote_data_source.dart';
 import 'package:olie/features/planned_items/data/repositories/planned_item_repository_impl.dart';
 import 'package:olie/features/planned_items/domain/repositories/planned_item_repository.dart';
@@ -169,6 +177,36 @@ Future<void> initDependencies() async {
       addSavingsGoal: sl(),
       updateSavingsGoal: sl(),
       deleteSavingsGoal: sl(),
+    ),
+  );
+
+  // Feature: Notifications
+  sl.registerLazySingleton<NotificationRemoteDataSource>(
+    () => NotificationRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<NotificationRealtimeDataSource>(
+    () => NotificationRealtimeDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<NotificationRepository>(
+    () => NotificationRepositoryImpl(
+      remoteDataSource: sl(),
+      realtimeDataSource: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(() => GetNotifications(sl()));
+  sl.registerLazySingleton(() => WatchRealtimeNotifications(sl()));
+  sl.registerLazySingleton(() => DisconnectRealtimeNotifications(sl()));
+
+  // Singleton (não factory): precisa sobreviver à navegação entre telas
+  // para manter a conexão WebSocket viva durante toda a sessão do usuário.
+  sl.registerLazySingleton(
+    () => NotificationBloc(
+      getNotifications: sl(),
+      watchRealtimeNotifications: sl(),
+      disconnectRealtimeNotifications: sl(),
     ),
   );
 }

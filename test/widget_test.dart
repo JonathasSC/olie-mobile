@@ -6,6 +6,10 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:olie/core/theme/app_theme.dart';
 import 'package:olie/core/usecases/usecase.dart';
+import 'package:olie/features/notifications/domain/usecases/disconnect_realtime_notifications.dart';
+import 'package:olie/features/notifications/domain/usecases/get_notifications.dart';
+import 'package:olie/features/notifications/domain/usecases/watch_realtime_notifications.dart';
+import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:olie/features/todo/domain/entities/todo.dart';
 import 'package:olie/features/todo/domain/usecases/add_todo.dart';
 import 'package:olie/features/todo/domain/usecases/delete_todo.dart';
@@ -22,11 +26,22 @@ class MockToggleTodo extends Mock implements ToggleTodo {}
 
 class MockDeleteTodo extends Mock implements DeleteTodo {}
 
+class MockGetNotifications extends Mock implements GetNotifications {}
+
+class MockWatchRealtimeNotifications extends Mock
+    implements WatchRealtimeNotifications {}
+
+class MockDisconnectRealtimeNotifications extends Mock
+    implements DisconnectRealtimeNotifications {}
+
 void main() {
   late MockGetTodos getTodos;
   late MockAddTodo addTodo;
   late MockToggleTodo toggleTodo;
   late MockDeleteTodo deleteTodo;
+  late MockGetNotifications getNotifications;
+  late MockWatchRealtimeNotifications watchRealtimeNotifications;
+  late MockDisconnectRealtimeNotifications disconnectRealtimeNotifications;
 
   setUpAll(() {
     registerFallbackValue(const NoParams());
@@ -40,6 +55,10 @@ void main() {
     addTodo = MockAddTodo();
     toggleTodo = MockToggleTodo();
     deleteTodo = MockDeleteTodo();
+    getNotifications = MockGetNotifications();
+    watchRealtimeNotifications = MockWatchRealtimeNotifications();
+    disconnectRealtimeNotifications = MockDisconnectRealtimeNotifications();
+    when(() => watchRealtimeNotifications()).thenAnswer((_) => const Stream.empty());
   });
 
   TodoBloc buildBloc() => TodoBloc(
@@ -47,6 +66,12 @@ void main() {
         addTodo: addTodo,
         toggleTodo: toggleTodo,
         deleteTodo: deleteTodo,
+      );
+
+  NotificationBloc buildNotificationBloc() => NotificationBloc(
+        getNotifications: getNotifications,
+        watchRealtimeNotifications: watchRealtimeNotifications,
+        disconnectRealtimeNotifications: disconnectRealtimeNotifications,
       );
 
   testWidgets('TodoScreen shows empty state when there are no todos', (
@@ -57,8 +82,13 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
-        home: BlocProvider<TodoBloc>(
-          create: (_) => buildBloc()..add(const TodosRequested()),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<TodoBloc>(
+              create: (_) => buildBloc()..add(const TodosRequested()),
+            ),
+            BlocProvider<NotificationBloc>(create: (_) => buildNotificationBloc()),
+          ],
           child: const TodoScreen(),
         ),
       ),
@@ -77,8 +107,13 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light,
-        home: BlocProvider<TodoBloc>(
-          create: (_) => buildBloc()..add(const TodosRequested()),
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<TodoBloc>(
+              create: (_) => buildBloc()..add(const TodosRequested()),
+            ),
+            BlocProvider<NotificationBloc>(create: (_) => buildNotificationBloc()),
+          ],
           child: const TodoScreen(),
         ),
       ),

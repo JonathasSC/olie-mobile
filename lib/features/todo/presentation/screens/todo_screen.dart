@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:olie/features/todo/presentation/widgets/todo_input_field.dart';
 import 'package:olie/features/todo/presentation/widgets/todo_list_item.dart';
@@ -14,6 +15,20 @@ class TodoScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Tarefas'),
         actions: [
+          BlocBuilder<NotificationBloc, NotificationState>(
+            builder: (context, state) {
+              return IconButton(
+                tooltip: 'Notificações',
+                icon: Badge(
+                  isLabelVisible: state.notifications.isNotEmpty,
+                  label: Text('${state.notifications.length}'),
+                  child: const Icon(Icons.notifications_outlined),
+                ),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed('/notifications'),
+              );
+            },
+          ),
           IconButton(
             tooltip: 'Metas de economia',
             icon: const Icon(Icons.savings_outlined),
