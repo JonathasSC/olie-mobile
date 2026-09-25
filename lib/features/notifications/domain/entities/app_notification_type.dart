@@ -1,6 +1,7 @@
 enum AppNotificationType {
   purchaseDateApproaching,
-  sufficientBalance;
+  sufficientBalance,
+  wearItemReplacementApproaching;
 
   String get apiValue {
     switch (this) {
@@ -8,6 +9,8 @@ enum AppNotificationType {
         return 'PURCHASE_DATE_APPROACHING';
       case AppNotificationType.sufficientBalance:
         return 'SUFFICIENT_BALANCE';
+      case AppNotificationType.wearItemReplacementApproaching:
+        return 'WEAR_ITEM_REPLACEMENT_APPROACHING';
     }
   }
 
@@ -17,6 +20,8 @@ enum AppNotificationType {
         return 'Data da compra se aproximando';
       case AppNotificationType.sufficientBalance:
         return 'Saldo suficiente';
+      case AppNotificationType.wearItemReplacementApproaching:
+        return 'Troca de item se aproximando';
     }
   }
 
@@ -26,6 +31,8 @@ enum AppNotificationType {
         return AppNotificationType.purchaseDateApproaching;
       case 'SUFFICIENT_BALANCE':
         return AppNotificationType.sufficientBalance;
+      case 'WEAR_ITEM_REPLACEMENT_APPROACHING':
+        return AppNotificationType.wearItemReplacementApproaching;
       default:
         throw ArgumentError('Tipo de notificação desconhecido: $value');
     }

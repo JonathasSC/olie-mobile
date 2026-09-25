@@ -14,6 +14,8 @@ class NotificationListItem extends StatelessWidget {
         return Icons.event_outlined;
       case AppNotificationType.sufficientBalance:
         return Icons.savings_outlined;
+      case AppNotificationType.wearItemReplacementApproaching:
+        return Icons.build_outlined;
     }
   }
 

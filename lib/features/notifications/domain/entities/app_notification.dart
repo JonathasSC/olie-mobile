@@ -7,6 +7,7 @@ class AppNotification extends Equatable {
   final AppNotificationType type;
   final String message;
   final String? plannedItemId;
+  final String? wearItemId;
   final DateTime receivedAt;
 
   const AppNotification({
@@ -14,9 +15,17 @@ class AppNotification extends Equatable {
     required this.type,
     required this.message,
     this.plannedItemId,
+    this.wearItemId,
     required this.receivedAt,
   });
 
   @override
-  List<Object?> get props => [id, type, message, plannedItemId, receivedAt];
+  List<Object?> get props => [
+    id,
+    type,
+    message,
+    plannedItemId,
+    wearItemId,
+    receivedAt,
+  ];
 }

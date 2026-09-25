@@ -7,6 +7,7 @@ class AppNotificationModel extends AppNotification {
     required super.type,
     required super.message,
     super.plannedItemId,
+    super.wearItemId,
     required super.receivedAt,
   });
 
@@ -19,6 +20,7 @@ class AppNotificationModel extends AppNotification {
       type: AppNotificationType.fromApiValue(json['type'] as String),
       message: json['message'] as String,
       plannedItemId: json['plannedItemId'] as String?,
+      wearItemId: json['wearItemId'] as String?,
       receivedAt: DateTime.parse(timestamp),
     );
   }

@@ -54,6 +54,16 @@ import 'package:olie/features/todo/domain/usecases/delete_todo.dart';
 import 'package:olie/features/todo/domain/usecases/get_todos.dart';
 import 'package:olie/features/todo/domain/usecases/toggle_todo.dart';
 import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
+import 'package:olie/features/wear_items/data/datasources/wear_item_remote_data_source.dart';
+import 'package:olie/features/wear_items/data/repositories/wear_item_repository_impl.dart';
+import 'package:olie/features/wear_items/domain/repositories/wear_item_repository.dart';
+import 'package:olie/features/wear_items/domain/usecases/add_wear_item.dart';
+import 'package:olie/features/wear_items/domain/usecases/delete_wear_item.dart';
+import 'package:olie/features/wear_items/domain/usecases/get_wear_item_detail.dart';
+import 'package:olie/features/wear_items/domain/usecases/get_wear_items.dart';
+import 'package:olie/features/wear_items/domain/usecases/replace_wear_item.dart';
+import 'package:olie/features/wear_items/domain/usecases/update_wear_item.dart';
+import 'package:olie/features/wear_items/presentation/bloc/wear_item_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -177,6 +187,33 @@ Future<void> initDependencies() async {
       addSavingsGoal: sl(),
       updateSavingsGoal: sl(),
       deleteSavingsGoal: sl(),
+    ),
+  );
+
+  // Feature: Wear Items
+  sl.registerLazySingleton<WearItemRemoteDataSource>(
+    () => WearItemRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<WearItemRepository>(
+    () => WearItemRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => GetWearItems(sl()));
+  sl.registerLazySingleton(() => GetWearItemDetail(sl()));
+  sl.registerLazySingleton(() => AddWearItem(sl()));
+  sl.registerLazySingleton(() => UpdateWearItem(sl()));
+  sl.registerLazySingleton(() => DeleteWearItem(sl()));
+  sl.registerLazySingleton(() => ReplaceWearItem(sl()));
+
+  sl.registerFactory(
+    () => WearItemBloc(
+      getWearItems: sl(),
+      getWearItemDetail: sl(),
+      addWearItem: sl(),
+      updateWearItem: sl(),
+      deleteWearItem: sl(),
+      replaceWearItem: sl(),
     ),
   );
 

@@ -30,6 +30,11 @@ class TodoScreen extends StatelessWidget {
             },
           ),
           IconButton(
+            tooltip: 'Controle de desgaste',
+            icon: const Icon(Icons.build_outlined),
+            onPressed: () => Navigator.of(context).pushNamed('/wear-items'),
+          ),
+          IconButton(
             tooltip: 'Metas de economia',
             icon: const Icon(Icons.savings_outlined),
             onPressed: () => Navigator.of(context).pushNamed('/savings-goals'),
