@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:olie/features/planned_items/domain/entities/planned_item_priority.dart';
 
-typedef PlannedItemFormSubmit =
-    void Function({
-      required String name,
-      required PlannedItemPriority priority,
-      required double estimatedValue,
-      required DateTime estimatedDate,
-    });
+typedef PlannedItemFormSubmit = void Function({
+  required String name,
+  required PlannedItemPriority priority,
+  required double estimatedValue,
+  required DateTime estimatedDate,
+});
 
 class PlannedItemForm extends StatefulWidget {
   final String? initialName;
@@ -106,87 +105,67 @@ class _PlannedItemFormState extends State<PlannedItemForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(labelText: 'Nome'),
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<PlannedItemPriority>(
+          initialValue: _priority,
+          decoration: const InputDecoration(labelText: 'Prioridade'),
+          items: PlannedItemPriority.values
+              .map(
+                (priority) => DropdownMenuItem(
+                  value: priority,
+                  child: Text(priority.label),
+                ),
+              )
+              .toList(),
+          onChanged: (value) {
+            if (value != null) setState(() => _priority = value);
+          },
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _valueController,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Valor estimado',
+            prefixText: 'R\$ ',
+          ),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _pickDate,
+          icon: const Icon(Icons.calendar_today_outlined),
+          label: Text(
+            _date == null ? 'Escolher data estimada' : _formatDate(_date!),
+          ),
+        ),
+        if (_errorText != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            _errorText!,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ],
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome',
-                border: OutlineInputBorder(),
-              ),
+            TextButton(
+              onPressed: widget.onCancel,
+              child: const Text('Cancelar'),
             ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<PlannedItemPriority>(
-              initialValue: _priority,
-              decoration: const InputDecoration(
-                labelText: 'Prioridade',
-                border: OutlineInputBorder(),
-              ),
-              items: PlannedItemPriority.values
-                  .map(
-                    (priority) => DropdownMenuItem(
-                      value: priority,
-                      child: Text(priority.label),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _priority = value);
-              },
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _valueController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: 'Valor estimado',
-                prefixText: 'R\$ ',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _pickDate,
-              icon: const Icon(Icons.calendar_today_outlined),
-              label: Text(
-                _date == null
-                    ? 'Escolher data estimada'
-                    : _formatDate(_date!),
-              ),
-            ),
-            if (_errorText != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _errorText!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ],
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: widget.onCancel,
-                  child: const Text('Cancelar'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _submit,
-                  child: Text(widget.submitLabel),
-                ),
-              ],
-            ),
+            const SizedBox(width: 8),
+            FilledButton(onPressed: _submit, child: Text(widget.submitLabel)),
           ],
         ),
-      ),
+      ],
     );
   }
 }

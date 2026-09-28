@@ -4,14 +4,13 @@ import 'package:olie/features/wear_items/domain/entities/wear_item.dart';
 import 'package:olie/features/wear_items/presentation/widgets/wear_date_field.dart';
 import 'package:olie/features/wear_items/presentation/widgets/wear_formatters.dart';
 
-typedef WearItemReplaceSubmit =
-    void Function({
-      required DateTime purchaseDate,
-      DateTime? installationDate,
-      DateTime? removalDate,
-      double? purchaseValue,
-      String? paymentMethod,
-    });
+typedef WearItemReplaceSubmit = void Function({
+  required DateTime purchaseDate,
+  DateTime? installationDate,
+  DateTime? removalDate,
+  double? purchaseValue,
+  String? paymentMethod,
+});
 
 class WearItemReplaceForm extends StatefulWidget {
   final WearItem item;
@@ -96,9 +95,7 @@ class _WearItemReplaceFormState extends State<WearItemReplaceForm> {
     // checamos essa data efetiva contra o início do ciclo atual.
     final effectiveRemoval =
         _removalDate ??
-        (_installed
-            ? _installationDate
-            : DateUtils.dateOnly(DateTime.now()));
+        (_installed ? _installationDate : DateUtils.dateOnly(DateTime.now()));
     if (effectiveRemoval.isBefore(_currentCycleStart)) {
       setState(
         () => _errorText =
@@ -120,16 +117,11 @@ class _WearItemReplaceFormState extends State<WearItemReplaceForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Registrar troca · ${widget.item.name}',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
           WearDateField(
             label: 'Compra da nova',
             value: _purchaseDate,
@@ -167,7 +159,6 @@ class _WearItemReplaceFormState extends State<WearItemReplaceForm> {
             decoration: const InputDecoration(
               labelText: 'Valor pago (opcional)',
               prefixText: 'R\$ ',
-              border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
@@ -176,7 +167,6 @@ class _WearItemReplaceFormState extends State<WearItemReplaceForm> {
             decoration: const InputDecoration(
               labelText: 'Forma de pagamento (opcional)',
               hintText: 'Informe para lançar a despesa',
-              border: OutlineInputBorder(),
             ),
           ),
           if (_errorText != null) ...[

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:olie/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:olie/features/auth/presentation/widgets/auth_brand.dart';
 import 'package:olie/features/auth/presentation/widgets/auth_submit_button.dart';
 import 'package:olie/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
@@ -30,11 +31,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthBloc>().add(
-          LoginSubmitted(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          ),
-        );
+      LoginSubmitted(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
@@ -54,10 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
               context.read<NotificationBloc>()
                 ..add(const NotificationsRequested())
                 ..add(const RealtimeConnectionRequested());
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/home',
-                (route) => false,
-              );
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/home', (route) => false);
             }
           },
           child: Center(
@@ -71,12 +70,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Text(
-                        'Entrar',
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 32),
+                      const AuthBrand(title: 'Entrar'),
+                      const SizedBox(height: 16),
                       AuthTextField(
                         controller: _emailController,
                         label: 'E-mail',

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:olie/core/presentation/formatters.dart';
+import 'package:olie/core/theme/app_theme.dart';
 import 'package:olie/features/notifications/domain/entities/app_notification.dart';
 import 'package:olie/features/notifications/domain/entities/app_notification_type.dart';
 
@@ -15,24 +17,51 @@ class NotificationListItem extends StatelessWidget {
       case AppNotificationType.sufficientBalance:
         return Icons.savings_outlined;
       case AppNotificationType.wearItemReplacementApproaching:
-        return Icons.build_outlined;
+        return Icons.autorenew;
     }
   }
 
-  String _formatDate(DateTime date) {
-    final local = date.toLocal();
-    String twoDigits(int value) => value.toString().padLeft(2, '0');
-    return '${twoDigits(local.day)}/${twoDigits(local.month)}/${local.year} '
-        '${twoDigits(local.hour)}:${twoDigits(local.minute)}';
+  Color _colorFor(OliePalette p, AppNotificationType type) {
+    switch (type) {
+      case AppNotificationType.purchaseDateApproaching:
+      case AppNotificationType.sufficientBalance:
+        return p.money;
+      case AppNotificationType.wearItemReplacementApproaching:
+        return p.olive;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: CircleAvatar(child: Icon(_iconFor(notification.type))),
-      title: Text(notification.message),
-      subtitle: Text(
-        '${notification.type.label} · ${_formatDate(notification.receivedAt)}',
+    final p = OliePalette.of(context);
+    final color = _colorFor(p, notification.type);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(_iconFor(notification.type), size: 20, color: color),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  notification.message,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${notification.type.label} · ${formatDateTime(notification.receivedAt)}',
+                  style: OlieText.data(context, size: 11.5),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

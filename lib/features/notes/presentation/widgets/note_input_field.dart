@@ -28,7 +28,7 @@ class _NoteInputFieldState extends State<NoteInputField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
@@ -37,17 +37,16 @@ class _NoteInputFieldState extends State<NoteInputField> {
               controller: _controller,
               minLines: 1,
               maxLines: 4,
-              decoration: const InputDecoration(
-                hintText: 'Nova nota',
-                border: OutlineInputBorder(),
-              ),
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(hintText: 'Escreva uma nota…'),
               textInputAction: TextInputAction.newline,
             ),
           ),
           const SizedBox(width: 8),
           IconButton.filled(
+            tooltip: 'Guardar nota',
             onPressed: _submit,
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.arrow_upward),
           ),
         ],
       ),

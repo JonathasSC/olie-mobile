@@ -28,21 +28,22 @@ class _TodoInputFieldState extends State<TodoInputField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: _controller,
               decoration: const InputDecoration(
-                hintText: 'Nova tarefa',
-                border: OutlineInputBorder(),
+                hintText: 'Adicionar tarefa',
+                isDense: true,
               ),
               onSubmitted: (_) => _submit(),
             ),
           ),
           const SizedBox(width: 8),
           IconButton.filled(
+            tooltip: 'Adicionar tarefa',
             onPressed: _submit,
             icon: const Icon(Icons.add),
           ),

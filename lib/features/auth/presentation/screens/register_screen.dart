@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:olie/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:olie/features/auth/presentation/widgets/auth_brand.dart';
 import 'package:olie/features/auth/presentation/widgets/auth_submit_button.dart';
 import 'package:olie/features/auth/presentation/widgets/auth_text_field.dart';
 import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
@@ -32,18 +33,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     context.read<AuthBloc>().add(
-          RegisterSubmitted(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          ),
-        );
+      RegisterSubmitted(
+        name: _nameController.text.trim(),
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Criar conta')),
+      appBar: AppBar(),
       body: SafeArea(
         child: BlocListener<AuthBloc, AuthState>(
           listener: (context, state) {
@@ -58,10 +59,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               context.read<NotificationBloc>()
                 ..add(const NotificationsRequested())
                 ..add(const RealtimeConnectionRequested());
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                '/home',
-                (route) => false,
-              );
+              Navigator.of(context)
+                  .pushNamedAndRemoveUntil('/home', (route) => false);
             }
           },
           child: Center(
@@ -75,6 +74,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      const AuthBrand(title: 'Criar conta'),
+                      const SizedBox(height: 16),
                       AuthTextField(
                         controller: _nameController,
                         label: 'Nome',

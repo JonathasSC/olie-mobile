@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:olie/core/presentation/olie_widgets.dart';
 import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:olie/features/notifications/presentation/widgets/notification_list_item.dart';
 
@@ -10,7 +11,7 @@ class NotificationsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Notificações')),
+      appBar: AppBar(title: const Text('Avisos')),
       body: BlocBuilder<NotificationBloc, NotificationState>(
         builder: (context, state) {
           if (state.status == NotificationStatus.loading) {
@@ -25,14 +26,17 @@ class NotificationsScreen extends StatelessWidget {
           }
 
           if (state.notifications.isEmpty) {
-            return const Center(
-              child: Text('Nenhuma notificação por aqui ainda.'),
+            return const EmptyHint(
+              title: 'Nenhum aviso ainda.',
+              hint:
+                  'O Olie avisa aqui quando uma compra ou troca se aproxima '
+                  'e quando o saldo já cobre uma compra planejada.',
             );
           }
 
           return ListView.separated(
             itemCount: state.notifications.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
+            separatorBuilder: (_, _) => const Divider(indent: 54),
             itemBuilder: (context, index) {
               return NotificationListItem(
                 notification: state.notifications[index],

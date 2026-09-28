@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
-typedef PlannedItemCompleteSubmit =
-    void Function({required String paymentMethod, double? value});
+typedef PlannedItemCompleteSubmit = void Function({
+  required String paymentMethod,
+  double? value,
+});
 
 class PlannedItemCompleteForm extends StatefulWidget {
   final double estimatedValue;
@@ -63,35 +65,26 @@ class _PlannedItemCompleteFormState extends State<PlannedItemCompleteForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            'Efetivar compra',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 12),
           TextField(
             controller: _paymentMethodController,
             autofocus: true,
             decoration: const InputDecoration(
               labelText: 'Forma de pagamento',
               hintText: 'Pix, Dinheiro, Cartão de débito...',
-              border: OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
           TextField(
             controller: _valueController,
-            keyboardType: const TextInputType.numberWithOptions(
-              decimal: true,
-            ),
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
             decoration: const InputDecoration(
               labelText: 'Valor pago',
               prefixText: 'R\$ ',
-              border: OutlineInputBorder(),
             ),
           ),
           if (_errorText != null) ...[
@@ -110,10 +103,7 @@ class _PlannedItemCompleteFormState extends State<PlannedItemCompleteForm> {
                 child: const Text('Cancelar'),
               ),
               const SizedBox(width: 8),
-              FilledButton(
-                onPressed: _submit,
-                child: const Text('Confirmar'),
-              ),
+              FilledButton(onPressed: _submit, child: const Text('Confirmar')),
             ],
           ),
         ],

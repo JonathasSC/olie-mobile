@@ -7,18 +7,9 @@ import 'package:olie/core/theme/app_theme.dart';
 import 'package:olie/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:olie/features/auth/presentation/screens/login_screen.dart';
 import 'package:olie/features/auth/presentation/screens/register_screen.dart';
-import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
-import 'package:olie/features/notes/presentation/screens/notes_screen.dart';
+import 'package:olie/features/home/presentation/screens/home_shell.dart';
 import 'package:olie/features/notifications/presentation/bloc/notification_bloc.dart';
 import 'package:olie/features/notifications/presentation/screens/notifications_screen.dart';
-import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
-import 'package:olie/features/planned_items/presentation/screens/planned_items_screen.dart';
-import 'package:olie/features/savings_goals/presentation/bloc/savings_goal_bloc.dart';
-import 'package:olie/features/savings_goals/presentation/screens/savings_goals_screen.dart';
-import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
-import 'package:olie/features/todo/presentation/screens/todo_screen.dart';
-import 'package:olie/features/wear_items/presentation/bloc/wear_item_bloc.dart';
-import 'package:olie/features/wear_items/presentation/screens/wear_items_screen.dart';
 
 final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
@@ -63,29 +54,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (_) => const LoginScreen(),
           '/register': (_) => const RegisterScreen(),
-          '/home': (_) => BlocProvider(
-                create: (_) => di.sl<TodoBloc>()..add(const TodosRequested()),
-                child: const TodoScreen(),
-              ),
-          '/notes': (_) => BlocProvider(
-                create: (_) => di.sl<NoteBloc>()..add(const NotesRequested()),
-                child: const NotesScreen(),
-              ),
-          '/planned-items': (_) => BlocProvider(
-                create: (_) => di.sl<PlannedItemBloc>()
-                  ..add(const PlannedItemsRequested()),
-                child: const PlannedItemsScreen(),
-              ),
-          '/savings-goals': (_) => BlocProvider(
-                create: (_) => di.sl<SavingsGoalBloc>()
-                  ..add(const SavingsGoalsRequested()),
-                child: const SavingsGoalsScreen(),
-              ),
-          '/wear-items': (_) => BlocProvider(
-                create: (_) =>
-                    di.sl<WearItemBloc>()..add(const WearItemsRequested()),
-                child: const WearItemsScreen(),
-              ),
+          '/home': (_) => const HomeShell(),
           '/notifications': (_) => const NotificationsScreen(),
         },
       ),

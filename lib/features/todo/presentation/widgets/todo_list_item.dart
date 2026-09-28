@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:olie/core/theme/app_theme.dart';
 import 'package:olie/features/todo/domain/entities/todo.dart';
 
 class TodoListItem extends StatelessWidget {
@@ -16,29 +17,31 @@ class TodoListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: ValueKey(todo.id),
-      direction: DismissDirection.endToStart,
-      onDismissed: (_) => onDelete(),
-      background: Container(
-        color: Theme.of(context).colorScheme.errorContainer,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Icon(
-          Icons.delete_outline,
-          color: Theme.of(context).colorScheme.onErrorContainer,
+    final p = OliePalette.of(context);
+    return InkWell(
+      onTap: onToggle,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(8, 0, 4, 0),
+        child: Row(
+          children: [
+            Checkbox(value: todo.isDone, onChanged: (_) => onToggle()),
+            Expanded(
+              child: Text(
+                todo.title,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: todo.isDone ? p.muted : p.ink,
+                  decoration: todo.isDone ? TextDecoration.lineThrough : null,
+                  decorationColor: p.muted,
+                ),
+              ),
+            ),
+            IconButton(
+              tooltip: 'Remover tarefa',
+              icon: Icon(Icons.close, size: 18, color: p.muted),
+              onPressed: onDelete,
+            ),
+          ],
         ),
-      ),
-      child: CheckboxListTile(
-        value: todo.isDone,
-        onChanged: (_) => onToggle(),
-        title: Text(
-          todo.title,
-          style: todo.isDone
-              ? const TextStyle(decoration: TextDecoration.lineThrough)
-              : null,
-        ),
-        controlAffinity: ListTileControlAffinity.leading,
       ),
     );
   }

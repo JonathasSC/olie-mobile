@@ -4,15 +4,14 @@ import 'package:olie/features/wear_items/domain/entities/lifespan_unit.dart';
 import 'package:olie/features/wear_items/presentation/widgets/wear_date_field.dart';
 import 'package:olie/features/wear_items/presentation/widgets/wear_formatters.dart';
 
-typedef WearItemFormSubmit =
-    void Function({
-      required String name,
-      required int expectedLifespan,
-      required LifespanUnit expectedLifespanUnit,
-      required DateTime purchaseDate,
-      DateTime? installationDate,
-      double? purchaseValue,
-    });
+typedef WearItemFormSubmit = void Function({
+  required String name,
+  required int expectedLifespan,
+  required LifespanUnit expectedLifespanUnit,
+  required DateTime purchaseDate,
+  DateTime? installationDate,
+  double? purchaseValue,
+});
 
 class WearItemForm extends StatefulWidget {
   final String? initialName;
@@ -126,117 +125,100 @@ class _WearItemFormState extends State<WearItemForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(
+            labelText: 'Nome',
+            hintText: 'Filtro de água, pneus, escova de dentes...',
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
           children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome',
-                hintText: 'Filtro de água, pneus, escova de dentes...',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _lifespanController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      labelText: 'Vida útil esperada',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+            Expanded(
+              child: TextField(
+                controller: _lifespanController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Vida útil esperada',
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: DropdownButtonFormField<LifespanUnit>(
-                    initialValue: _unit,
-                    decoration: const InputDecoration(
-                      labelText: 'Unidade',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: LifespanUnit.values
-                        .map(
-                          (unit) => DropdownMenuItem(
-                            value: unit,
-                            child: Text(unit.label),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (value) {
-                      if (value != null) setState(() => _unit = value);
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            WearDateField(
-              label: 'Compra',
-              value: _purchaseDate,
-              onChanged: _onPurchaseDateChanged,
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              title: const Text('Já está em uso'),
-              subtitle: _installed
-                  ? null
-                  : const Text('Comprado e guardado (em estoque)'),
-              value: _installed,
-              onChanged: (value) => setState(() => _installed = value),
-            ),
-            if (_installed)
-              WearDateField(
-                label: 'Instalação',
-                value: _installationDate,
-                firstDate: _purchaseDate,
-                onChanged: (date) => setState(() => _installationDate = date),
-              ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _valueController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: 'Valor de compra (opcional)',
-                prefixText: 'R\$ ',
-                border: OutlineInputBorder(),
               ),
             ),
-            if (_errorText != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _errorText!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
+            const SizedBox(width: 12),
+            Expanded(
+              child: DropdownButtonFormField<LifespanUnit>(
+                initialValue: _unit,
+                decoration: const InputDecoration(labelText: 'Unidade'),
+                items: LifespanUnit.values
+                    .map(
+                      (unit) => DropdownMenuItem(
+                        value: unit,
+                        child: Text(unit.label),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => _unit = value);
+                },
               ),
-            ],
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: widget.onCancel,
-                  child: const Text('Cancelar'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _submit,
-                  child: Text(widget.submitLabel),
-                ),
-              ],
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 12),
+        WearDateField(
+          label: 'Compra',
+          value: _purchaseDate,
+          onChanged: _onPurchaseDateChanged,
+        ),
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Já está em uso'),
+          subtitle: _installed
+              ? null
+              : const Text('Comprado e guardado (em estoque)'),
+          value: _installed,
+          onChanged: (value) => setState(() => _installed = value),
+        ),
+        if (_installed)
+          WearDateField(
+            label: 'Instalação',
+            value: _installationDate,
+            firstDate: _purchaseDate,
+            onChanged: (date) => setState(() => _installationDate = date),
+          ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _valueController,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Valor de compra (opcional)',
+            prefixText: 'R\$ ',
+          ),
+        ),
+        if (_errorText != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            _errorText!,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ],
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: widget.onCancel,
+              child: const Text('Cancelar'),
+            ),
+            const SizedBox(width: 8),
+            FilledButton(onPressed: _submit, child: Text(widget.submitLabel)),
+          ],
+        ),
+      ],
     );
   }
 }

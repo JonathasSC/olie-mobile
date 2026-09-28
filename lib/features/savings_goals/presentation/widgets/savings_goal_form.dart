@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:olie/features/planned_items/domain/entities/planned_item.dart';
 import 'package:olie/features/savings_goals/domain/entities/savings_goal_period.dart';
 
-typedef SavingsGoalFormSubmit =
-    void Function({
-      required String name,
-      required double amount,
-      required SavingsGoalPeriod period,
-      String? plannedItemId,
-    });
+typedef SavingsGoalFormSubmit = void Function({
+  required String name,
+  required double amount,
+  required SavingsGoalPeriod period,
+  String? plannedItemId,
+});
 
 class SavingsGoalForm extends StatefulWidget {
   final String? initialName;
@@ -91,98 +90,74 @@ class _SavingsGoalFormState extends State<SavingsGoalForm> {
     final linkedItemStillExists =
         _plannedItemId == null || plannedItemIds.contains(_plannedItemId);
 
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nome',
-                border: OutlineInputBorder(),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextField(
+          controller: _nameController,
+          decoration: const InputDecoration(labelText: 'Nome'),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _amountController,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Valor a guardar por período',
+            prefixText: 'R\$ ',
+          ),
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<SavingsGoalPeriod>(
+          initialValue: _period,
+          decoration: const InputDecoration(labelText: 'Período'),
+          items: SavingsGoalPeriod.values
+              .map(
+                (period) =>
+                    DropdownMenuItem(value: period, child: Text(period.label)),
+              )
+              .toList(),
+          onChanged: (value) {
+            if (value != null) setState(() => _period = value);
+          },
+        ),
+        const SizedBox(height: 12),
+        DropdownButtonFormField<String?>(
+          initialValue: linkedItemStillExists ? _plannedItemId : null,
+          decoration: const InputDecoration(
+            labelText: 'Vincular a item planejado (opcional)',
+          ),
+          items: [
+            const DropdownMenuItem(value: null, child: Text('Nenhum')),
+            ...widget.plannedItems.map(
+              (item) => DropdownMenuItem(
+                value: item.id,
+                child: Text(item.name, overflow: TextOverflow.ellipsis),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: 'Valor a guardar por período',
-                prefixText: 'R\$ ',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<SavingsGoalPeriod>(
-              initialValue: _period,
-              decoration: const InputDecoration(
-                labelText: 'Período',
-                border: OutlineInputBorder(),
-              ),
-              items: SavingsGoalPeriod.values
-                  .map(
-                    (period) => DropdownMenuItem(
-                      value: period,
-                      child: Text(period.label),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (value) {
-                if (value != null) setState(() => _period = value);
-              },
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String?>(
-              initialValue: linkedItemStillExists ? _plannedItemId : null,
-              decoration: const InputDecoration(
-                labelText: 'Vincular a item planejado (opcional)',
-                border: OutlineInputBorder(),
-              ),
-              items: [
-                const DropdownMenuItem(value: null, child: Text('Nenhum')),
-                ...widget.plannedItems.map(
-                  (item) => DropdownMenuItem(
-                    value: item.id,
-                    child: Text(
-                      item.name,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ),
-              ],
-              onChanged: (value) => setState(() => _plannedItemId = value),
-            ),
-            if (_errorText != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _errorText!,
-                style: TextStyle(color: Theme.of(context).colorScheme.error),
-              ),
-            ],
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: widget.onCancel,
-                  child: const Text('Cancelar'),
-                ),
-                const SizedBox(width: 8),
-                FilledButton(
-                  onPressed: _submit,
-                  child: Text(widget.submitLabel),
-                ),
-              ],
             ),
           ],
+          onChanged: (value) => setState(() => _plannedItemId = value),
         ),
-      ),
+        if (_errorText != null) ...[
+          const SizedBox(height: 8),
+          Text(
+            _errorText!,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ],
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            TextButton(
+              onPressed: widget.onCancel,
+              child: const Text('Cancelar'),
+            ),
+            const SizedBox(width: 8),
+            FilledButton(onPressed: _submit, child: Text(widget.submitLabel)),
+          ],
+        ),
+      ],
     );
   }
 }
