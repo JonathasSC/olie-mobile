@@ -4,7 +4,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:olie/core/di/injection_container.dart' as di;
 import 'package:olie/core/presentation/olie_widgets.dart';
 import 'package:olie/core/theme/app_theme.dart';
+import 'package:olie/features/contacts/presentation/bloc/contact_bloc.dart';
+import 'package:olie/features/contacts/presentation/screens/contacts_view.dart';
+import 'package:olie/features/contacts/presentation/widgets/contact_sheets.dart';
 import 'package:olie/features/home/presentation/screens/today_view.dart';
+import 'package:olie/features/inquiries/presentation/bloc/inquiry_bloc.dart';
+import 'package:olie/features/inquiries/presentation/screens/inquiries_view.dart';
+import 'package:olie/features/inquiries/presentation/screens/inquiry_navigation.dart';
 import 'package:olie/features/notes/presentation/bloc/note_bloc.dart';
 import 'package:olie/features/notes/presentation/screens/notes_view.dart';
 import 'package:olie/features/planned_items/presentation/bloc/planned_item_bloc.dart';
@@ -16,6 +22,8 @@ import 'package:olie/features/todo/presentation/bloc/todo_bloc.dart';
 import 'package:olie/features/wear_items/presentation/bloc/wear_item_bloc.dart';
 import 'package:olie/features/wear_items/presentation/screens/wear_items_view.dart';
 import 'package:olie/features/wear_items/presentation/widgets/wear_item_sheets.dart';
+import 'package:olie/features/whatsapp/presentation/bloc/whatsapp_bloc.dart';
+import 'package:olie/features/whatsapp/presentation/widgets/whatsapp_status_bar.dart';
 
 /// Estrutura do app autenticado: quatro abas que compartilham os mesmos
 /// blocs, para que uma mudança em uma aba apareça na aba Hoje.
@@ -42,6 +50,17 @@ class HomeShell extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => di.sl<NoteBloc>()..add(const NotesRequested()),
+        ),
+        BlocProvider(
+          create: (_) => di.sl<ContactBloc>()..add(const ContactsRequested()),
+        ),
+        BlocProvider(
+          create: (_) => di.sl<WhatsAppBloc>()..add(const WhatsAppStarted()),
+        ),
+        BlocProvider(
+          create: (_) => di.sl<InquiryBloc>()
+            ..add(const InquiriesRequested())
+            ..add(const InquiryRealtimeStarted()),
         ),
       ],
       child: const _ErrorReporter(child: _Shell()),
@@ -84,6 +103,32 @@ class _ErrorReporter extends StatelessWidget {
               s.status == NoteStatus.failure && s.errorMessage != null,
           listener: (context, state) => showToast(context, state.errorMessage!),
         ),
+        BlocListener<ContactBloc, ContactState>(
+          listenWhen: (_, s) =>
+              s.status == ContactStatus.failure && s.errorMessage != null,
+          listener: (context, state) => showToast(context, state.errorMessage!),
+        ),
+        BlocListener<InquiryBloc, InquiryState>(
+          listenWhen: (_, s) =>
+              s.status == InquiryStatusView.failure && s.errorMessage != null,
+          listener: (context, state) => showToast(context, state.errorMessage!),
+        ),
+        // Resumo final de uma consulta que terminou (RF32), em qualquer aba.
+        BlocListener<InquiryBloc, InquiryState>(
+          listenWhen: (previous, current) =>
+              current.lastFinished != null &&
+              previous.lastFinished != current.lastFinished,
+          listener: (context, state) {
+            final totals = state.lastFinished!.totals;
+            showToast(
+              context,
+              totals.failed == 0
+                  ? 'Consulta concluída: ${totals.sent} enviada(s).'
+                  : 'Consulta concluída: ${totals.sent} enviada(s) e '
+                        '${totals.failed} com falha.',
+            );
+          },
+        ),
       ],
       child: child,
     );
@@ -102,6 +147,7 @@ const _destinations = [
   _Destination('Hoje', Icons.today_outlined, Icons.today),
   _Destination('Compras', Icons.shopping_bag_outlined, Icons.shopping_bag),
   _Destination('Desgaste', Icons.autorenew_outlined, Icons.autorenew),
+  _Destination('Consultas', Icons.forum_outlined, Icons.forum),
   _Destination('Notas', Icons.sticky_note_2_outlined, Icons.sticky_note_2),
 ];
 
@@ -126,6 +172,7 @@ class _ShellState extends State<_Shell> {
         _Tab(child: TodayView()),
         _ShoppingTab(),
         _WearTab(),
+        _InquiriesTab(),
         _Tab(title: 'Notas', eyebrow: 'Anotações da casa', child: NotesView()),
       ],
     );
@@ -306,6 +353,62 @@ class _WearTab extends StatelessWidget {
         ),
       ),
       child: const WearItemsView(),
+    );
+  }
+}
+
+enum _InquiriesSection { inquiries, contacts }
+
+class _InquiriesTab extends StatefulWidget {
+  const _InquiriesTab();
+
+  @override
+  State<_InquiriesTab> createState() => _InquiriesTabState();
+}
+
+class _InquiriesTabState extends State<_InquiriesTab> {
+  _InquiriesSection _section = _InquiriesSection.inquiries;
+
+  @override
+  Widget build(BuildContext context) {
+    final isInquiries = _section == _InquiriesSection.inquiries;
+    return _Tab(
+      title: 'Consultas',
+      eyebrow: 'Quem tem o que você procura',
+      header: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const WhatsAppStatusBar(),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+            child: SegmentedButton<_InquiriesSection>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(
+                  value: _InquiriesSection.inquiries,
+                  label: Text('Consultas'),
+                ),
+                ButtonSegment(
+                  value: _InquiriesSection.contacts,
+                  label: Text('Contatos'),
+                ),
+              ],
+              selected: {_section},
+              onSelectionChanged: (s) => setState(() => _section = s.first),
+            ),
+          ),
+        ],
+      ),
+      action: Builder(
+        builder: (context) => FloatingActionButton.extended(
+          onPressed: () => isInquiries
+              ? openNewInquiry(context)
+              : showNewContactSheet(context),
+          icon: Icon(isInquiries ? Icons.send : Icons.person_add_alt),
+          label: Text(isInquiries ? 'Nova consulta' : 'Novo contato'),
+        ),
+      ),
+      child: isInquiries ? const InquiriesView() : const ContactsView(),
     );
   }
 }

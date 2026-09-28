@@ -1,7 +1,9 @@
 enum AppNotificationType {
   purchaseDateApproaching,
   sufficientBalance,
-  wearItemReplacementApproaching;
+  wearItemReplacementApproaching,
+  whatsAppDisconnected,
+  inquiryFinished;
 
   String get apiValue {
     switch (this) {
@@ -11,6 +13,10 @@ enum AppNotificationType {
         return 'SUFFICIENT_BALANCE';
       case AppNotificationType.wearItemReplacementApproaching:
         return 'WEAR_ITEM_REPLACEMENT_APPROACHING';
+      case AppNotificationType.whatsAppDisconnected:
+        return 'WHATSAPP_DISCONNECTED';
+      case AppNotificationType.inquiryFinished:
+        return 'INQUIRY_FINISHED';
     }
   }
 
@@ -22,6 +28,10 @@ enum AppNotificationType {
         return 'Saldo suficiente';
       case AppNotificationType.wearItemReplacementApproaching:
         return 'Troca de item se aproximando';
+      case AppNotificationType.whatsAppDisconnected:
+        return 'WhatsApp desconectado';
+      case AppNotificationType.inquiryFinished:
+        return 'Consulta concluída';
     }
   }
 
@@ -33,6 +43,10 @@ enum AppNotificationType {
         return AppNotificationType.sufficientBalance;
       case 'WEAR_ITEM_REPLACEMENT_APPROACHING':
         return AppNotificationType.wearItemReplacementApproaching;
+      case 'WHATSAPP_DISCONNECTED':
+        return AppNotificationType.whatsAppDisconnected;
+      case 'INQUIRY_FINISHED':
+        return AppNotificationType.inquiryFinished;
       default:
         throw ArgumentError('Tipo de notificação desconhecido: $value');
     }

@@ -6,6 +6,40 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:olie/core/constants/app_constants.dart';
 import 'package:olie/core/network/auth_interceptor.dart';
 import 'package:olie/core/network/network_info.dart';
+import 'package:olie/core/network/realtime_client.dart';
+import 'package:olie/features/contacts/data/datasources/contact_remote_data_source.dart';
+import 'package:olie/features/contacts/data/repositories/contact_repository_impl.dart';
+import 'package:olie/features/contacts/domain/repositories/contact_repository.dart';
+import 'package:olie/features/contacts/domain/usecases/add_contact.dart';
+import 'package:olie/features/contacts/domain/usecases/add_contact_category.dart';
+import 'package:olie/features/contacts/domain/usecases/delete_contact.dart';
+import 'package:olie/features/contacts/domain/usecases/delete_contact_category.dart';
+import 'package:olie/features/contacts/domain/usecases/export_contacts.dart';
+import 'package:olie/features/contacts/domain/usecases/get_contact_categories.dart';
+import 'package:olie/features/contacts/domain/usecases/get_contacts.dart';
+import 'package:olie/features/contacts/domain/usecases/import_contacts.dart';
+import 'package:olie/features/contacts/domain/usecases/rename_contact_category.dart';
+import 'package:olie/features/contacts/domain/usecases/update_contact.dart';
+import 'package:olie/features/contacts/presentation/bloc/contact_bloc.dart';
+import 'package:olie/features/inquiries/data/datasources/inquiry_realtime_data_source.dart';
+import 'package:olie/features/inquiries/data/datasources/inquiry_remote_data_source.dart';
+import 'package:olie/features/inquiries/data/repositories/inquiry_repository_impl.dart';
+import 'package:olie/features/inquiries/domain/repositories/inquiry_repository.dart';
+import 'package:olie/features/inquiries/domain/usecases/cancel_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/create_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/get_inquiries.dart';
+import 'package:olie/features/inquiries/domain/usecases/get_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/get_inquiry_draft.dart';
+import 'package:olie/features/inquiries/domain/usecases/get_inquiry_photo.dart';
+import 'package:olie/features/inquiries/domain/usecases/get_inquiry_settings.dart';
+import 'package:olie/features/inquiries/domain/usecases/pause_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/preview_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/resend_failed_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/resume_inquiry.dart';
+import 'package:olie/features/inquiries/domain/usecases/upload_inquiry_photo.dart';
+import 'package:olie/features/inquiries/domain/usecases/watch_inquiry_events.dart';
+import 'package:olie/features/inquiries/presentation/bloc/inquiry_bloc.dart';
+import 'package:olie/features/inquiries/presentation/bloc/inquiry_composer_bloc.dart';
 import 'package:olie/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:olie/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:olie/features/auth/data/repositories/auth_repository_impl.dart';
@@ -64,6 +98,15 @@ import 'package:olie/features/wear_items/domain/usecases/get_wear_items.dart';
 import 'package:olie/features/wear_items/domain/usecases/replace_wear_item.dart';
 import 'package:olie/features/wear_items/domain/usecases/update_wear_item.dart';
 import 'package:olie/features/wear_items/presentation/bloc/wear_item_bloc.dart';
+import 'package:olie/features/whatsapp/data/datasources/whatsapp_realtime_data_source.dart';
+import 'package:olie/features/whatsapp/data/datasources/whatsapp_remote_data_source.dart';
+import 'package:olie/features/whatsapp/data/repositories/whatsapp_repository_impl.dart';
+import 'package:olie/features/whatsapp/domain/repositories/whatsapp_repository.dart';
+import 'package:olie/features/whatsapp/domain/usecases/connect_whatsapp.dart';
+import 'package:olie/features/whatsapp/domain/usecases/disconnect_whatsapp.dart';
+import 'package:olie/features/whatsapp/domain/usecases/get_whatsapp_connection.dart';
+import 'package:olie/features/whatsapp/domain/usecases/watch_whatsapp_connection.dart';
+import 'package:olie/features/whatsapp/presentation/bloc/whatsapp_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -81,6 +124,8 @@ Future<void> initDependencies() async {
   );
   sl.registerLazySingleton<InternetConnection>(() => InternetConnection());
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
+  // Uma conexão STOMP para toda a sessão (notificações, WhatsApp, consultas).
+  sl.registerLazySingleton<RealtimeClient>(() => RealtimeClient(sl()));
 
   // Feature: Auth
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -214,6 +259,123 @@ Future<void> initDependencies() async {
       updateWearItem: sl(),
       deleteWearItem: sl(),
       replaceWearItem: sl(),
+    ),
+  );
+
+  // Feature: Contacts
+  sl.registerLazySingleton<ContactRemoteDataSource>(
+    () => ContactRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<ContactRepository>(
+    () => ContactRepositoryImpl(remoteDataSource: sl()),
+  );
+
+  sl.registerLazySingleton(() => GetContacts(sl()));
+  sl.registerLazySingleton(() => GetContactCategories(sl()));
+  sl.registerLazySingleton(() => AddContact(sl()));
+  sl.registerLazySingleton(() => UpdateContact(sl()));
+  sl.registerLazySingleton(() => DeleteContact(sl()));
+  sl.registerLazySingleton(() => AddContactCategory(sl()));
+  sl.registerLazySingleton(() => RenameContactCategory(sl()));
+  sl.registerLazySingleton(() => DeleteContactCategory(sl()));
+  sl.registerLazySingleton(() => ImportContacts(sl()));
+  sl.registerLazySingleton(() => ExportContacts(sl()));
+
+  sl.registerFactory(
+    () => ContactBloc(
+      getContacts: sl(),
+      getContactCategories: sl(),
+      addContact: sl(),
+      updateContact: sl(),
+      deleteContact: sl(),
+      addContactCategory: sl(),
+      renameContactCategory: sl(),
+      deleteContactCategory: sl(),
+      importContacts: sl(),
+      exportContacts: sl(),
+    ),
+  );
+
+  // Feature: WhatsApp
+  sl.registerLazySingleton<WhatsAppRemoteDataSource>(
+    () => WhatsAppRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<WhatsAppRealtimeDataSource>(
+    () => WhatsAppRealtimeDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<WhatsAppRepository>(
+    () => WhatsAppRepositoryImpl(
+      remoteDataSource: sl(),
+      realtimeDataSource: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(() => GetWhatsAppConnection(sl()));
+  sl.registerLazySingleton(() => ConnectWhatsApp(sl()));
+  sl.registerLazySingleton(() => DisconnectWhatsApp(sl()));
+  sl.registerLazySingleton(() => WatchWhatsAppConnection(sl()));
+
+  sl.registerFactory(
+    () => WhatsAppBloc(
+      getWhatsAppConnection: sl(),
+      connectWhatsApp: sl(),
+      disconnectWhatsApp: sl(),
+      watchWhatsAppConnection: sl(),
+    ),
+  );
+
+  // Feature: Inquiries
+  sl.registerLazySingleton<InquiryRemoteDataSource>(
+    () => InquiryRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<InquiryRealtimeDataSource>(
+    () => InquiryRealtimeDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<InquiryRepository>(
+    () => InquiryRepositoryImpl(
+      remoteDataSource: sl(),
+      realtimeDataSource: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(() => GetInquirySettings(sl()));
+  sl.registerLazySingleton(() => PreviewInquiry(sl()));
+  sl.registerLazySingleton(() => CreateInquiry(sl()));
+  sl.registerLazySingleton(() => GetInquiries(sl()));
+  sl.registerLazySingleton(() => GetInquiry(sl()));
+  sl.registerLazySingleton(() => GetInquiryDraft(sl()));
+  sl.registerLazySingleton(() => PauseInquiry(sl()));
+  sl.registerLazySingleton(() => ResumeInquiry(sl()));
+  sl.registerLazySingleton(() => CancelInquiry(sl()));
+  sl.registerLazySingleton(() => ResendFailedInquiry(sl()));
+  sl.registerLazySingleton(() => UploadInquiryPhoto(sl()));
+  sl.registerLazySingleton(() => GetInquiryPhoto(sl()));
+  sl.registerLazySingleton(() => WatchInquiryEvents(sl()));
+
+  sl.registerFactory(
+    () => InquiryBloc(
+      getInquiries: sl(),
+      getInquiry: sl(),
+      pauseInquiry: sl(),
+      resumeInquiry: sl(),
+      cancelInquiry: sl(),
+      resendFailedInquiry: sl(),
+      watchInquiryEvents: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => InquiryComposerBloc(
+      getInquirySettings: sl(),
+      getInquiryDraft: sl(),
+      uploadInquiryPhoto: sl(),
+      previewInquiry: sl(),
+      createInquiry: sl(),
     ),
   );
 

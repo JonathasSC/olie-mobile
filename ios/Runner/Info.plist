@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Para fotografar os itens que você quer consultar.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Para anexar fotos dos itens que você quer consultar.</string>
 </dict>
 </plist>

@@ -10,7 +10,16 @@ abstract class Failure extends Equatable {
 }
 
 class ServerFailure extends Failure {
-  const ServerFailure([super.message = 'Erro ao comunicar com o servidor.']);
+  /// Código do erro de negócio devolvido pela API, quando houver.
+  final String? code;
+
+  const ServerFailure([
+    super.message = 'Erro ao comunicar com o servidor.',
+    this.code,
+  ]);
+
+  @override
+  List<Object?> get props => [message, code];
 }
 
 class CacheFailure extends Failure {

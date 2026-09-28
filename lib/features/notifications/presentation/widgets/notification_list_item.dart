@@ -18,6 +18,10 @@ class NotificationListItem extends StatelessWidget {
         return Icons.savings_outlined;
       case AppNotificationType.wearItemReplacementApproaching:
         return Icons.autorenew;
+      case AppNotificationType.whatsAppDisconnected:
+        return Icons.link_off;
+      case AppNotificationType.inquiryFinished:
+        return Icons.forum_outlined;
     }
   }
 
@@ -27,7 +31,10 @@ class NotificationListItem extends StatelessWidget {
       case AppNotificationType.sufficientBalance:
         return p.money;
       case AppNotificationType.wearItemReplacementApproaching:
+      case AppNotificationType.inquiryFinished:
         return p.olive;
+      case AppNotificationType.whatsAppDisconnected:
+        return p.critical;
     }
   }
 

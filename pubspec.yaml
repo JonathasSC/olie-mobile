@@ -58,6 +58,8 @@ dependencies:
 
   # STOMP over WebSocket (real-time notifications)
   stomp_dart_client: ^3.0.1
+  image_picker: ^1.2.3
+  file_picker: ^11.0.3
 
 dev_dependencies:
   flutter_test:
